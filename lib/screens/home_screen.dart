@@ -35,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('DocBao'),
+        title: const Text('Đọc Báo Online'),
         actions: [
           IconButton(
             icon: const Icon(Icons.bookmarks),
@@ -47,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SettingsScreen())),
+            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => SettingsScreen(feedProvider: feedProvider))),
           ),
         ],
       ),

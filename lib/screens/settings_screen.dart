@@ -1,40 +1,30 @@
 import 'package:flutter/material.dart';
 
-class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key});
+import '../providers/feed_provider.dart';
+import 'manage_feeds_screen.dart';
 
-  @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
-}
+class SettingsScreen extends StatelessWidget {
+  final FeedProvider? feedProvider;
 
-class _SettingsScreenState extends State<SettingsScreen> {
-  bool _dark = false;
+  const SettingsScreen({super.key, this.feedProvider});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: const Text('Cài đặt')),
       body: ListView(
         children: [
-          SwitchListTile(
-            title: const Text('Dark mode (local preview)'),
-            value: _dark,
-            onChanged: (v) => setState(() => _dark = v),
-          ),
           ListTile(
             title: const Text('Manage feeds'),
             leading: const Icon(Icons.rss_feed),
             onTap: () {
-              // Navigate to manage feeds screen; find FeedProvider from ancestor by type is not used in this app,
-              // so require caller to push ManageFeedsScreen with provider passed. We'll attempt to read it via
-              // ModalRoute arguments or use Navigator to push a placeholder.
-              Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => const SizedBox.shrink()));
+              if (feedProvider != null) {
+                Navigator.of(context).push(MaterialPageRoute(builder: (_) => ManageFeedsScreen(feedProvider: feedProvider!)));
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Không thể mở Manage feeds từ đây')));
+              }
             },
           ),
-          ListTile(
-            title: const Text('About'),
-            subtitle: const Text('DocBao sample app'),
-          )
         ],
       ),
     );
