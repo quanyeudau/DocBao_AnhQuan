@@ -38,4 +38,17 @@ class StorageService {
     }
   }
   // Feed list persistence removed per project settings (VSS). No-op helper methods could be added later if needed.
+
+  // Theme preference key
+  final String _themeKey = 'theme_mode_v1';
+
+  Future<void> saveThemeModeString(String mode) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_themeKey, mode);
+  }
+
+  Future<String?> loadThemeModeString() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_themeKey);
+  }
 }

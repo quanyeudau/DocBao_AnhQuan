@@ -15,42 +15,85 @@ void main() async {
   final feedProvider = FeedProvider(rssService: rss);
   final bookmarkProvider = BookmarkProvider(storage: storage);
 
-  runApp(MyApp(feedProvider: feedProvider, bookmarkProvider: bookmarkProvider));
+  runApp(MyApp(feedProvider: feedProvider, bookmarkProvider: bookmarkProvider, storage: storage));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   final FeedProvider feedProvider;
   final BookmarkProvider bookmarkProvider;
+  final StorageService storage;
 
-  const MyApp({super.key, required this.feedProvider, required this.bookmarkProvider});
+  const MyApp({super.key, required this.feedProvider, required this.bookmarkProvider, required this.storage});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  ThemeMode _themeMode = ThemeMode.system;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTheme();
+  }
+
+  Future<void> _loadTheme() async {
+    final s = await widget.storage.loadThemeModeString();
+    setState(() {
+      if (s == 'dark') {
+        _themeMode = ThemeMode.dark;
+      } else if (s == 'light') {
+        _themeMode = ThemeMode.light;
+      } else {
+        _themeMode = ThemeMode.system;
+      }
+    });
+  }
+
+  Future<void> _setTheme(ThemeMode mode) async {
+    setState(() => _themeMode = mode);
+    final str = mode == ThemeMode.dark ? 'dark' : (mode == ThemeMode.light ? 'light' : 'system');
+    await widget.storage.saveThemeModeString(str);
+  }
 
   @override
   Widget build(BuildContext context) {
     // A fresh, bright seed color for a light, airy look
     final seed = const Color(0xFF0A84FF); // bright blue
-    final colorScheme = ColorScheme.fromSeed(seedColor: seed, brightness: Brightness.light);
+    final lightScheme = ColorScheme.fromSeed(seedColor: seed, brightness: Brightness.light);
+    final darkScheme = ColorScheme.fromSeed(seedColor: seed, brightness: Brightness.dark);
 
     final theme = ThemeData(
       useMaterial3: true,
-      colorScheme: colorScheme,
-  scaffoldBackgroundColor: colorScheme.surface,
-      appBarTheme: AppBarTheme(centerTitle: true, elevation: 2, backgroundColor: colorScheme.primary, foregroundColor: colorScheme.onPrimary),
+      colorScheme: lightScheme,
+      scaffoldBackgroundColor: lightScheme.surface,
+      appBarTheme: AppBarTheme(centerTitle: true, elevation: 2, backgroundColor: lightScheme.primary, foregroundColor: lightScheme.onPrimary),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: colorScheme.primary,
-          foregroundColor: colorScheme.onPrimary,
+          backgroundColor: lightScheme.primary,
+          foregroundColor: lightScheme.onPrimary,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 18),
         ),
       ),
-      textTheme: ThemeData.light().textTheme.apply(bodyColor: colorScheme.onSurface, displayColor: colorScheme.onSurface),
+      textTheme: ThemeData.light().textTheme.apply(bodyColor: lightScheme.onSurface, displayColor: lightScheme.onSurface),
+    );
+
+    final darkTheme = ThemeData(
+      useMaterial3: true,
+      colorScheme: darkScheme,
+      scaffoldBackgroundColor: darkScheme.surface,
+      appBarTheme: AppBarTheme(centerTitle: true, elevation: 2, backgroundColor: darkScheme.primary, foregroundColor: darkScheme.onPrimary),
     );
 
     return MaterialApp(
       title: 'DocBao',
       debugShowCheckedModeBanner: false,
       theme: theme,
-      home: HomeScreen(feedProvider: feedProvider, bookmarkProvider: bookmarkProvider),
+      darkTheme: darkTheme,
+      themeMode: _themeMode,
+      home: HomeScreen(feedProvider: widget.feedProvider, bookmarkProvider: widget.bookmarkProvider, themeMode: _themeMode, onThemeChanged: _setTheme),
     );
   }
 }

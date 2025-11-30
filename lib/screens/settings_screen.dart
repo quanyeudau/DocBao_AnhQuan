@@ -5,8 +5,10 @@ import 'manage_feeds_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   final FeedProvider? feedProvider;
+  final ThemeMode themeMode;
+  final ValueChanged<ThemeMode> onThemeChanged;
 
-  const SettingsScreen({super.key, this.feedProvider});
+  const SettingsScreen({super.key, this.feedProvider, required this.themeMode, required this.onThemeChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -14,6 +16,12 @@ class SettingsScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Cài đặt')),
       body: ListView(
         children: [
+          SwitchListTile(
+            title: const Text('Dark mode'),
+            subtitle: const Text('Chuyển giao diện sáng/tối'),
+            value: themeMode == ThemeMode.dark,
+            onChanged: (v) => onThemeChanged(v ? ThemeMode.dark : ThemeMode.light),
+          ),
           ListTile(
             title: const Text('Manage feeds'),
             leading: const Icon(Icons.rss_feed),

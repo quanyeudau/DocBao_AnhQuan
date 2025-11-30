@@ -14,8 +14,16 @@ import '../widgets/feed_tile.dart';
 class HomeScreen extends StatefulWidget {
   final FeedProvider feedProvider;
   final BookmarkProvider bookmarkProvider;
+  final ThemeMode themeMode;
+  final ValueChanged<ThemeMode> onThemeChanged;
 
-  const HomeScreen({super.key, required this.feedProvider, required this.bookmarkProvider});
+  const HomeScreen({
+    super.key,
+    required this.feedProvider,
+    required this.bookmarkProvider,
+    required this.themeMode,
+    required this.onThemeChanged,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -47,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => SettingsScreen(feedProvider: feedProvider))),
+            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => SettingsScreen(feedProvider: feedProvider, themeMode: widget.themeMode, onThemeChanged: widget.onThemeChanged))),
           ),
         ],
       ),
