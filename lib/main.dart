@@ -26,13 +26,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final seed = const Color(0xFF6750A4);
+    // A fresh, bright seed color for a light, airy look
+    final seed = const Color(0xFF0A84FF); // bright blue
+    final colorScheme = ColorScheme.fromSeed(seedColor: seed, brightness: Brightness.light);
+
     final theme = ThemeData(
       useMaterial3: true,
-      colorSchemeSeed: seed,
-      brightness: Brightness.light,
-  appBarTheme: const AppBarTheme(centerTitle: true, elevation: 2),
-      elevatedButtonTheme: ElevatedButtonThemeData(style: ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)), padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 18))),
+      colorScheme: colorScheme,
+  scaffoldBackgroundColor: colorScheme.surface,
+      appBarTheme: AppBarTheme(centerTitle: true, elevation: 2, backgroundColor: colorScheme.primary, foregroundColor: colorScheme.onPrimary),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: colorScheme.primary,
+          foregroundColor: colorScheme.onPrimary,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 18),
+        ),
+      ),
+      textTheme: ThemeData.light().textTheme.apply(bodyColor: colorScheme.onSurface, displayColor: colorScheme.onSurface),
     );
 
     return MaterialApp(
