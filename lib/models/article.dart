@@ -8,6 +8,7 @@ class Article {
   final String? thumbnail;
   final DateTime? pubDate;
   final String? content;
+  final String? sourceId;
 
   Article({
     required this.id,
@@ -17,6 +18,7 @@ class Article {
     this.thumbnail,
     this.pubDate,
     this.content,
+    this.sourceId,
   });
 
   Article copyWith({
@@ -27,6 +29,7 @@ class Article {
     String? thumbnail,
     DateTime? pubDate,
     String? content,
+    String? sourceId,
   }) {
     return Article(
       id: id ?? this.id,
@@ -36,6 +39,7 @@ class Article {
       thumbnail: thumbnail ?? this.thumbnail,
       pubDate: pubDate ?? this.pubDate,
       content: content ?? this.content,
+      sourceId: sourceId ?? this.sourceId,
     );
   }
 
@@ -48,6 +52,7 @@ class Article {
       thumbnail: json['thumbnail'] as String?,
       pubDate: json['pubDate'] != null ? DateTime.tryParse(json['pubDate']) : null,
       content: json['content'] as String?,
+      sourceId: json['sourceId'] as String?,
     );
   }
 
@@ -59,6 +64,7 @@ class Article {
         'thumbnail': thumbnail,
         'pubDate': pubDate?.toIso8601String(),
         'content': content,
+    'sourceId': sourceId,
       };
 
   @override

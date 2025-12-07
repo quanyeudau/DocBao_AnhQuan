@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 // imports trimmed: article/feed_source are provided by providers; not used directly here
 import '../providers/bookmark_provider.dart';
+import '../models/article.dart';
 import '../providers/feed_provider.dart';
 import '../screens/article_screen.dart';
 import '../screens/settings_screen.dart';
@@ -10,6 +11,7 @@ import '../screens/bookmarks_screen.dart';
 import '../screens/manage_feeds_screen.dart';
 import '../widgets/article_tile.dart';
 import '../widgets/feed_tile.dart';
+import 'article_search.dart';
 
 class HomeScreen extends StatefulWidget {
   final FeedProvider feedProvider;
@@ -36,6 +38,12 @@ class _HomeScreenState extends State<HomeScreen> {
     widget.feedProvider.fetchArticles();
   }
 
+  String? _selectedCategoryId; // null means All
+  List<Article> _filteredArticles(List<Article> all) {
+    if (_selectedCategoryId == null || _selectedCategoryId == 'all') return all;
+    return all.where((a) => a.sourceId == _selectedCategoryId).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final feedProvider = widget.feedProvider;
@@ -45,6 +53,10 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('Đọc Báo Online'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () => showSearch(context: context, delegate: ArticleSearchDelegate(widget.feedProvider.articles)),
+          ),
           IconButton(
             icon: const Icon(Icons.bookmarks),
             onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => BookmarksScreen(bookmarkProvider: bookmarkProvider))),
@@ -89,6 +101,33 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
           ),
+          // Category chips (All + feeds)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            height: 56,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                  child: ChoiceChip(
+                    label: const Text('Tất cả'),
+                    selected: _selectedCategoryId == null || _selectedCategoryId == 'all',
+                    onSelected: (_) => setState(() => _selectedCategoryId = 'all'),
+                  ),
+                ),
+                for (final f in feedProvider.feeds)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                    child: ChoiceChip(
+                      label: Text(f.title),
+                      selected: _selectedCategoryId == f.id,
+                      onSelected: (_) => setState(() => _selectedCategoryId = f.id),
+                    ),
+                  ),
+              ],
+            ),
+          ),
           Expanded(
             child: AnimatedBuilder(
               animation: feedProvider,
@@ -97,8 +136,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   return const Center(child: CircularProgressIndicator());
                 }
                 final articles = feedProvider.articles;
+                final displayed = _filteredArticles(articles);
                 final lastError = feedProvider.lastError;
-                if (articles.isEmpty) {
+                if (displayed.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -121,9 +161,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 return RefreshIndicator(
                   onRefresh: () => feedProvider.fetchArticles(),
                   child: ListView.builder(
-                    itemCount: articles.length + 1,
+                    itemCount: displayed.length + 1,
                     itemBuilder: (context, idx) {
-                      if (idx == articles.length) {
+                      if (idx == displayed.length) {
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                           child: Center(
@@ -139,7 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       // Featured card for the first article
                       if (idx == 0) {
-                        final a = articles[0];
+                        final a = displayed[0];
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           child: GestureDetector(
@@ -221,7 +261,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       }
 
-                      final a = articles[idx];
+                      final a = displayed[idx];
                       return ArticleTile(
                         article: a,
                         onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => ArticleScreen(article: a))),

@@ -83,6 +83,7 @@ class RssService {
       pubDate: parsedDate,
       content: item.content?.toString(),
       thumbnail: thumbnail,
+      sourceId: source?.id,
     );
   }
 
