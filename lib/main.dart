@@ -59,8 +59,9 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    // A fresh, bright seed color for a light, airy look
-    final seed = const Color(0xFF0A84FF); // bright blue
+
+    // New refined palette: teal-green seed for calm, modern look
+    final seed = const Color(0xFF00695C); // deep teal
     final lightScheme = ColorScheme.fromSeed(seedColor: seed, brightness: Brightness.light);
     final darkScheme = ColorScheme.fromSeed(seedColor: seed, brightness: Brightness.dark);
 
@@ -68,15 +69,37 @@ class _MyAppState extends State<MyApp> {
       useMaterial3: true,
       colorScheme: lightScheme,
       scaffoldBackgroundColor: lightScheme.surface,
-      appBarTheme: AppBarTheme(centerTitle: true, elevation: 2, backgroundColor: lightScheme.primary, foregroundColor: lightScheme.onPrimary),
+      appBarTheme: AppBarTheme(
+        centerTitle: true,
+        elevation: 2,
+        backgroundColor: lightScheme.primaryContainer,
+        foregroundColor: lightScheme.onPrimaryContainer,
+        surfaceTintColor: lightScheme.primary,
+      ),
+      // CardTheme removed to avoid SDK compatibility issues; default cards will inherit colorScheme
+      listTileTheme: ListTileThemeData(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        tileColor: lightScheme.surface,
+        textColor: lightScheme.onSurface,
+        iconColor: lightScheme.primary,
+      ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: lightScheme.primary,
           foregroundColor: lightScheme.onPrimary,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 18),
         ),
       ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: lightScheme.primary,
+          side: BorderSide(color: lightScheme.outline),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      ),
+      iconTheme: IconThemeData(color: lightScheme.primary, size: 20),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: lightScheme.secondary, foregroundColor: lightScheme.onSecondary),
       textTheme: ThemeData.light().textTheme.apply(bodyColor: lightScheme.onSurface, displayColor: lightScheme.onSurface),
     );
 
@@ -84,7 +107,9 @@ class _MyAppState extends State<MyApp> {
       useMaterial3: true,
       colorScheme: darkScheme,
       scaffoldBackgroundColor: darkScheme.surface,
-      appBarTheme: AppBarTheme(centerTitle: true, elevation: 2, backgroundColor: darkScheme.primary, foregroundColor: darkScheme.onPrimary),
+      appBarTheme: AppBarTheme(centerTitle: true, elevation: 2, backgroundColor: darkScheme.primaryContainer, foregroundColor: darkScheme.onPrimaryContainer),
+  // CardTheme removed for dark theme as well; use default card appearance from colorScheme
+      listTileTheme: ListTileThemeData(tileColor: darkScheme.surface, textColor: darkScheme.onSurface, iconColor: darkScheme.secondary),
     );
 
     return MaterialApp(
